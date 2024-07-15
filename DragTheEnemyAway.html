@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>DragTheEnemyAway</title>
+  <meta charset="UTF-8">
+  <style>
+  html, body {
+    height: 100%;
+    margin: 0;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  canvas {
+    border: 1px solid black;
+  }
+  </style>
+</head>
+<body>
+<canvas width="375" height="667" id="game"></canvas>
+<script>
+const canvas = document.getElementById('game');
+const context = canvas.getContext('2d');
+
+let end = false;
+
+let background = new Image(1280, 480);
+background.src = "background.png";
+
+let player = new Image(448, 64);
+player.src = "player.png";
+let playerFrame = 0;
+
+context.font = "30px Arial";
+context.fillStyle = 'yellow';
+
+function loop() {
+  requestAnimationFrame(loop);
+  context.clearRect(0,0,canvas.width,canvas.height);
+
+  context.drawImage(background, 0, 0, 320, 480, 0, 0, canvas.width, canvas.height);
+  if (!end) {
+    context.drawImage(player, playerFrame * 64, 0, 64, 64, 130, 350, 128, 128);
+  }
+}
+
+function display() {
+  if (!end) {
+    playerFrame += 1;
+    if (playerFrame >= 7)
+      playerFrame = 0;
+    canvas.clearRect(0, 0, canvas.width, canvas.height);
+  }
+}
+
+setInterval(display, 120);
+
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
