@@ -27,6 +27,7 @@ const canvas = document.getElementById('game');
 const context = canvas.getContext('2d');
 
 let end = false;
+let menu = true;
 
 let score = 0;
 
@@ -41,6 +42,7 @@ player.src = "player.png";
 let playerFrame = 0;
 
 context.font = "30px Arial";
+context.textAlign = "center";
 context.fillStyle = 'blue';
 
 let xpos = [0, Math.floor(canvas.width / 5), Math.floor(canvas.width / 2), canvas.width - Math.floor(canvas.width / 5), canvas.width];
@@ -69,7 +71,10 @@ function loop() {
 
   context.drawImage(background, bx, 0, 320, 480, 0, 0, canvas.width, canvas.height);
   context.drawImage(background, 0, 0, 320, 480, bx2, 0, canvas.width, canvas.height);
-  if (!end) {
+  if (menu) {
+    context.font = "70px Arial";
+    context.fillText("tap to start", canvas.width / 2, canvas.height / 2);
+  } else if (!end) {
     context.drawImage(player, playerFrame * 64, 0, 64, 64, 130, 350, 128, 128);
     enemies.forEach(function(enemy) {
       context.drawImage(enemyImage, enemy.state * 32, 0, 32, 16, enemy.x, enemy.y, 32, 16);
@@ -88,21 +93,18 @@ function loop() {
       enemies.push({x:x, y:y, angle:angle, dirx:dirx, diry:diry, state:0});
     }
     enemies = enemies.filter(function(enemy) {
-      context.font = "20px Arial";
       return onScreen(enemy);
     })
   } else {
     context.font = "50px Arial";
-    context.textAlign = "center";
     context.fillText("your score : " + score, canvas.width / 2, canvas.height / 2);
     context.font = "20px Arial";
-    context.fillText("tap to restart", canvas.width / 2
-    , canvas.height - 10);
+    context.fillText("tap to restart", canvas.width / 2, canvas.height - 10);
   }
 }
 
 function backgroundMove() {
-  if (!end) {
+  if (!end && !menu) {
     bx += 1;
     if (bx >= blenght)
       bx2 = canvas.width - (bx - blenght);
@@ -114,7 +116,7 @@ function backgroundMove() {
 }
 
 function display() {
-  if (!end) {
+  if (!end && !menu) {
     playerFrame += 1;
     if (playerFrame >= 7)
       playerFrame = 0;
@@ -123,7 +125,7 @@ function display() {
 }
 
 function enemyMove() {
-  if (!end) {
+  if (!end && !menu) {
     enemies.forEach(function(enemy) {
       enemy.y += enemy.diry;
       enemy.x += enemy.dirx;
@@ -132,7 +134,7 @@ function enemyMove() {
 }
 
 function collide(enemy) {
-  if (!end && enemy.state == 0) {
+  if (!end && enemy.state == 0 && !menu) {
     if (enemy.y > 475 || 400 > enemy.y + 16)
       return false;
     if (enemy.x > 245 || 145 > enemy.x + 32)
@@ -143,7 +145,7 @@ function collide(enemy) {
 }
 
 function onScreen(enemy) {
-  if (!end) {
+  if (!end && !menu) {
     if (enemy.y > canvas.height || enemy.y + 16 < 0)
       return false;
     if (enemy.x > canvas.width || enemy.x + 32 < 0)
@@ -154,7 +156,7 @@ function onScreen(enemy) {
 }
 
 function incrementSpawnTime() {
-  if (!end)
+  if (!end && !menu)
     spawnTime += 1;
 }
 
@@ -171,6 +173,10 @@ document.addEventListener('mousedown', function(e) {
   let relativeX = e.x - canvas.offsetLeft;
 
   mousedown = true;
+  if (menu) {
+    menu = false;
+    return;
+  }
   if (!end) {
     enemies.forEach(function(enemy) {
       if (e.y < enemy.y || e.y > enemy.y + 16)
