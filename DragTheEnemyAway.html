@@ -28,6 +28,8 @@ const context = canvas.getContext('2d');
 
 let end = false;
 
+let score = 0;
+
 let background = new Image(1280, 480);
 background.src = "background.png";
 let bx = 0;
@@ -39,7 +41,7 @@ player.src = "player.png";
 let playerFrame = 0;
 
 context.font = "30px Arial";
-context.fillStyle = 'yellow';
+context.fillStyle = 'blue';
 
 let xpos = [0, Math.floor(canvas.width / 5), Math.floor(canvas.width / 2), canvas.width - Math.floor(canvas.width / 5), canvas.width];
 let ypos = [0, canvas.height];
@@ -58,6 +60,9 @@ enemies[0].diry = Math.sin(enemies[0].angle);
 let enemyImage = new Image(64, 16);
 enemyImage.src = "enemy.png";
 
+let enemySpawnRate = 600;
+let spawnTime = 0;
+
 function loop() {
   requestAnimationFrame(loop);
   context.clearRect(0,0,canvas.width,canvas.height);
@@ -71,6 +76,28 @@ function loop() {
       if (collide(enemy))
         end = true;
     });
+    if (spawnTime >= enemySpawnRate) {
+      spawnTime = 0;
+      if (enemySpawnRate > 100)
+        enemySpawnRate -= 10;
+      let x = xpos[Math.floor(Math.random() * 5)];
+      let y = ypos[Math.floor(Math.random() * 2)];
+      let angle = Math.atan2((350 + 64) - y, (130 + 64) - x);
+      let dirx = Math.cos(angle);
+      let diry = Math.sin(angle);
+      enemies.push({x:x, y:y, angle:angle, dirx:dirx, diry:diry, state:0});
+    }
+    enemies = enemies.filter(function(enemy) {
+      context.font = "20px Arial";
+      return onScreen(enemy);
+    })
+  } else {
+    context.font = "50px Arial";
+    context.textAlign = "center";
+    context.fillText("your score : " + score, canvas.width / 2, canvas.height / 2);
+    context.font = "20px Arial";
+    context.fillText("tap to restart", canvas.width / 2
+    , canvas.height - 10);
   }
 }
 
@@ -115,9 +142,26 @@ function collide(enemy) {
   return false;
 }
 
+function onScreen(enemy) {
+  if (!end) {
+    if (enemy.y > canvas.height || enemy.y + 16 < 0)
+      return false;
+    if (enemy.x > canvas.width || enemy.x + 32 < 0)
+      return false;
+    return true;
+  }
+  return false;
+}
+
+function incrementSpawnTime() {
+  if (!end)
+    spawnTime += 1;
+}
+
 setInterval(display, 120);
 setInterval(backgroundMove, 10);
 setInterval(enemyMove, 20);
+setInterval(incrementSpawnTime, 1);
 
 document.addEventListener('mouseup', function(e) {
   mousedown = false;
@@ -127,15 +171,23 @@ document.addEventListener('mousedown', function(e) {
   let relativeX = e.x - canvas.offsetLeft;
 
   mousedown = true;
-  enemies.forEach(function(enemy) {
-    if (e.y < enemy.y || e.y > enemy.y + 16)
-      return;
-    if (relativeX < enemy.x || relativeX > enemy.x + 32)
-      return;
-    enemy.state = 1;
-    enemy.dirx = - enemy.dirx;
-    enemy.diry = - enemy.diry;
-  });
+  if (!end) {
+    enemies.forEach(function(enemy) {
+      if (e.y < enemy.y || e.y > enemy.y + 16)
+        return;
+      if (relativeX < enemy.x || relativeX > enemy.x + 32)
+        return;
+      enemy.state = 1;
+      enemy.dirx = - enemy.dirx;
+      enemy.diry = - enemy.diry;
+      score += 1;
+    });
+  } else {
+    score = 0;
+    enemySpawnRate = 600;
+    spawnTime = 0;
+    end = false;
+  }
 });
 
 requestAnimationFrame(loop);
