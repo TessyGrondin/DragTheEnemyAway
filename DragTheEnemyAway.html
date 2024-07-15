@@ -105,7 +105,7 @@ function enemyMove() {
 }
 
 function collide(enemy) {
-  if (!end) {
+  if (!end && enemy.state == 0) {
     if (enemy.y > 475 || 400 > enemy.y + 16)
       return false;
     if (enemy.x > 245 || 145 > enemy.x + 32)
@@ -118,6 +118,25 @@ function collide(enemy) {
 setInterval(display, 120);
 setInterval(backgroundMove, 10);
 setInterval(enemyMove, 20);
+
+document.addEventListener('mouseup', function(e) {
+  mousedown = false;
+});
+
+document.addEventListener('mousedown', function(e) {
+  let relativeX = e.x - canvas.offsetLeft;
+
+  mousedown = true;
+  enemies.forEach(function(enemy) {
+    if (e.y < enemy.y || e.y > enemy.y + 16)
+      return;
+    if (relativeX < enemy.x || relativeX > enemy.x + 32)
+      return;
+    enemy.state = 1;
+    enemy.dirx = - enemy.dirx;
+    enemy.diry = - enemy.diry;
+  });
+});
 
 requestAnimationFrame(loop);
 </script>
