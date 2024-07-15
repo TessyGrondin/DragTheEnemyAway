@@ -41,6 +41,23 @@ let playerFrame = 0;
 context.font = "30px Arial";
 context.fillStyle = 'yellow';
 
+let xpos = [0, Math.floor(canvas.width / 5), Math.floor(canvas.width / 2), canvas.width - Math.floor(canvas.width / 5), canvas.width];
+let ypos = [0, canvas.height];
+
+let enemies = [{
+  x: xpos[Math.floor(Math.random() * 5)],
+  y: ypos[Math.floor(Math.random() * 2)],
+  angle: 0,
+  dirx: 0,
+  diry: 0,
+  state: 0
+}];
+enemies[0].angle = Math.atan2((350 + 64) - enemies[0].y, (130 + 64) - enemies[0].x);
+enemies[0].dirx = Math.cos(enemies[0].angle);
+enemies[0].diry = Math.sin(enemies[0].angle);
+let enemyImage = new Image(64, 16);
+enemyImage.src = "enemy.png";
+
 function loop() {
   requestAnimationFrame(loop);
   context.clearRect(0,0,canvas.width,canvas.height);
@@ -49,6 +66,9 @@ function loop() {
   context.drawImage(background, 0, 0, 320, 480, bx2, 0, canvas.width, canvas.height);
   if (!end) {
     context.drawImage(player, playerFrame * 64, 0, 64, 64, 130, 350, 128, 128);
+    enemies.forEach(function(enemy) {
+      context.drawImage(enemyImage, enemy.state * 32, 0, 32, 16, enemy.x, enemy.y, 32, 16);
+    });
   }
 }
 
@@ -73,8 +93,18 @@ function display() {
   }
 }
 
+function enemyMove() {
+  if (!end) {
+    enemies.forEach(function(enemy) {
+      enemy.y += enemy.diry;
+      enemy.x += enemy.dirx;
+    });
+  }
+}
+
 setInterval(display, 120);
 setInterval(backgroundMove, 10);
+setInterval(enemyMove, 20);
 
 requestAnimationFrame(loop);
 </script>
