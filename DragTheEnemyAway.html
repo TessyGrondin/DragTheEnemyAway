@@ -30,6 +30,9 @@ let end = false;
 
 let background = new Image(1280, 480);
 background.src = "background.png";
+let bx = 0;
+let bx2 = canvas.width;
+let blenght = 1280 - canvas.width;
 
 let player = new Image(448, 64);
 player.src = "player.png";
@@ -42,9 +45,22 @@ function loop() {
   requestAnimationFrame(loop);
   context.clearRect(0,0,canvas.width,canvas.height);
 
-  context.drawImage(background, 0, 0, 320, 480, 0, 0, canvas.width, canvas.height);
+  context.drawImage(background, bx, 0, 320, 480, 0, 0, canvas.width, canvas.height);
+  context.drawImage(background, 0, 0, 320, 480, bx2, 0, canvas.width, canvas.height);
   if (!end) {
     context.drawImage(player, playerFrame * 64, 0, 64, 64, 130, 350, 128, 128);
+  }
+}
+
+function backgroundMove() {
+  if (!end) {
+    bx += 1;
+    if (bx >= blenght)
+      bx2 = canvas.width - (bx - blenght);
+    if (bx2 <= 0) {
+      bx = 0;
+      bx2 = canvas.width;
+    }
   }
 }
 
@@ -58,6 +74,7 @@ function display() {
 }
 
 setInterval(display, 120);
+setInterval(backgroundMove, 10);
 
 requestAnimationFrame(loop);
 </script>
