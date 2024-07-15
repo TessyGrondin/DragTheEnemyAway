@@ -68,6 +68,8 @@ function loop() {
     context.drawImage(player, playerFrame * 64, 0, 64, 64, 130, 350, 128, 128);
     enemies.forEach(function(enemy) {
       context.drawImage(enemyImage, enemy.state * 32, 0, 32, 16, enemy.x, enemy.y, 32, 16);
+      if (collide(enemy))
+        end = true;
     });
   }
 }
@@ -100,6 +102,17 @@ function enemyMove() {
       enemy.x += enemy.dirx;
     });
   }
+}
+
+function collide(enemy) {
+  if (!end) {
+    if (enemy.y > 475 || 400 > enemy.y + 16)
+      return false;
+    if (enemy.x > 245 || 145 > enemy.x + 32)
+      return false;
+    return true;
+  }
+  return false;
 }
 
 setInterval(display, 120);
