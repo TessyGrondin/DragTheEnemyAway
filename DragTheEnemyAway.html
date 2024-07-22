@@ -171,6 +171,7 @@ document.addEventListener('mouseup', function(e) {
 
 document.addEventListener('mousedown', function(e) {
   let relativeX = e.x - canvas.offsetLeft;
+  let relativeY = e.y - canvas.offsetTop;
 
   mousedown = true;
   if (menu) {
@@ -179,7 +180,7 @@ document.addEventListener('mousedown', function(e) {
   }
   if (!end) {
     enemies.forEach(function(enemy) {
-      if (e.y < enemy.y || e.y > enemy.y + 16)
+      if (relativeY < enemy.y || relativeY > enemy.y + 16)
         return;
       if (relativeX < enemy.x || relativeX > enemy.x + 32)
         return;
